@@ -10,7 +10,7 @@ If you got here you either already know what they are, and thus you don't need a
 
 * So what is it?
 A bunch of scripts (haven't decided on the names just yet)    
- - settings.sh : holds a few configuration parameters
- - script1.sh : downloads the Cygwin packages and copies the necessary files to the destination folder; let's call it the installer
- - script2.sh : creates shortcuts for mintty in various locations for all the WSL distributions it can find installed
- - script3.sh: (idea) checks for updates, maybe
+    - settings.sh : holds a few configuration parameters
+    - script1.sh : downloads the Cygwin packages and copies the necessary files to the destination folder; let's call it the installer
+    - script2.sh : creates shortcuts for mintty in various locations for all the WSL distributions it can find installed
+    - script3.sh: (idea) checks for updates, maybe
