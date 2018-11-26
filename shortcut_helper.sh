@@ -83,7 +83,7 @@ build_shortcut(){
 get_sys_folder(){
 	cmd="Get-ItemProperty -Path \"Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders\" -name \"${1}\" | "
 	cmd+="Format-List \"${1}\" " 
-	powershell "${cmd}" | tr -d '\r' | grep -E "^${1}" | head -1 | awk -F' : ' '{print $2}'
+	powershell.exe "${cmd}" | tr -d '\r' | grep -E "^${1}" | head -1 | awk -F' : ' '{print $2}'
 }
 
 while read -r line; do
