@@ -16,7 +16,9 @@ d_setup(){
 	cd ${SRC_FOLDER}
 	sha512sum -c sha512.sum --ignore-missing || (
 	# recursive call if something is off 
-	rm setup.ini sha512.sum; d_setup
+	rm setup.ini sha512.sum
+	cd ..
+	d_setup
 	)
 	echo -en "\e[0m"
 	cd .. 
