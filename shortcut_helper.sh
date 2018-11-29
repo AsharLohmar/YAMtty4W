@@ -72,7 +72,7 @@ build_shortcut(){
 	sh_cmd="\$ws = New-Object -ComObject WScript.Shell; "
 	sh_cmd+="\$s = \$ws.CreateShortcut(\"${lnk}\"); "
 	sh_cmd+="\$s.TargetPath = \"${w_minty_path}\"; "
-	sh_cmd+="\$s.Arguments = \"-h error --WSL='${distro}' -~ /bin/bash -l\"; "
+	sh_cmd+="\$s.Arguments = \"--WSL='${distro}' ${mintty_args}\"; "
 	sh_cmd+="\$s.Description = \"${distro} - mintty\"; "
 	sh_cmd+="\$s.WorkingDirectory = \"$(wslpath -aw mintty)\"; "
 	sh_cmd+="\$s.IconLocation = \"$(wslpath -aw $(grep -lr WslLaunch ${d_u_path}/*.exe))\"; "
