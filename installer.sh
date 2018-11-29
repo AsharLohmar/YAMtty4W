@@ -63,7 +63,18 @@ cp_frompkg(){
 		mkdir -p "${dst%/*}"
 		cp="cp -rvup" # in this case we "rewrite" the folder structure, so we must not create the same folder structure
 	fi
-	$cp ${src} "${dst}"
+	for i in ${src}; do
+		$cp ${i} "${dst}" || (
+			# copy failed, usually 'cause file is in use ... you are running inside mintty
+			# these are windows files/exceutables, so we cant' overwrite or delete them as in linux, so e have to move them
+			# then retry the copy operation
+			[ -f ${i} ] && ( # it's a file, otherwise ... i don't know
+				t_dst="${dst%/}"; [ -d ${t_dst} ] && t_dst="${t_dst}/${i##*/}"
+				mv -v "${t_dst}" "${t_dst}.2del"
+				$cp ${i} "${dst}"
+			)
+		)
+	done
 	cd ../..
 }
 
@@ -109,6 +120,8 @@ pkgs[:d_wslbridge]="wslbridge*/wslbridge*#bin/"
 ## I've got the process running, some black window with some logs ... but couldn't seem to attach to it
  
 
+# clean up leftovers from the last run # 2> /dev/null
+find ${DEST_FOLDER} -name '*.2del' -delete  || echo -n ''
 
 for pkg in "${!pkgs[@]}"; do
     rm -rf ${SRC_FOLDER}/tmp/*
