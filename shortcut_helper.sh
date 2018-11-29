@@ -4,9 +4,9 @@ set -e
 show_help(){
 	cat<<-EOF
 Usage:
- $0 <options>
+ $0 <options> [distribution]
 
-Creates shortcuts for mintty in the current folder for each WSL distro it finds installed.
+Creates shortcuts for mintty in the current folder for each WSL distro it finds installed or if a "distribusion" string is passed, only for those that match the string
 
 Options:
  -d, --desktop             also place a shortcut on the desktop of the current user.
@@ -59,6 +59,17 @@ while true; do
     esac
 done
 
+sd=""
+if [ "${1% }" != "" ]; then
+	if [ "$(wslconfig.exe /l | tr -d '\r\0' | grep -c "${1}")" == 0  ]; then
+		echo "Unrecognized distribution";
+		echo -n "Available ";wslconfig.exe /l
+		exit 255
+	else
+		sd="${1}"
+	fi
+fi
+
 [ $(( $desktop_sh + $start_sh + $local_sh )) -eq 0 ] && [ "$path_sh" == ""  ] && (echo "Current args would create no shortcut."; show_help; exit 3)
 
 #echo "desktop_sh=${desktop_sh} start_sh=${start_sh} local_sh=${local_sh} path_sh=${path_sh}"
@@ -95,5 +106,4 @@ while read -r line; do
 	[ "${desktop_sh}" == "1" ] && ( echo -e "\tCreating shortcut on the Desktop";  build_shortcut "$(get_sys_folder "Desktop")" )
 	[ "${start_sh}" == "1" ] && ( echo -e "\tCreating shortcut in the StartMenu";  build_shortcut "$(get_sys_folder "Start Menu")" )
 	[ "${path_sh}" != "" ] && ( echo -e "\tCreating shortcut in $(wslpath -aw "${path_sh}")";  build_shortcut "$(wslpath -aw "${path_sh}")" )
-done<<<$(powershell.exe '(Get-ChildItem HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss | ForEach-Object {Get-ItemProperty $_.PSPath}) | select State,DistributionName,BasePath'  | tr -d '\r' | \grep -E '^\s+1' | awk '{print $2,$3}')
-
+done<<<$(powershell.exe '(Get-ChildItem HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss | ForEach-Object {Get-ItemProperty $_.PSPath}) | select State,DistributionName,BasePath'  | tr -d '\r' | \grep -E '^\s+1' | awk '{print $2,$3}' | grep "${sd}")
