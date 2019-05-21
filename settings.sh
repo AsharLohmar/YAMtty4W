@@ -1,3 +1,4 @@
+#!/bin/bash
 # change to a mirror close to you from the list available at https://cygwin.com/mirrors.html
 MIRROR="http://bo.mirror.garr.it/mirrors/sourceware.org/cygwin"
 
@@ -6,4 +7,4 @@ ARCH=$(uname -p) # do we need it or we are safe with a constant "x86_64" ? does 
 DEST_FOLDER="/mnt/d/tools/YAMtty4W"
 SRC_FOLDER="pkg"
 
-mintty_args="-h error -~ /bin/bash -l" # --WSL=${distro} will be added automatically
+mintty_args="-~ /bin/bash -l" # --WSL=${distro} will be added automatically
