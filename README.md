@@ -25,15 +25,15 @@ DEST_FOLDER="/mnt/d/tools/YAMtty4W"
 SRC_FOLDER="pkg"
 ```
 
-#### installer.sh
+#### setup.sh
 Downloads the Cygwin packages and copies the necessary files to the destination folder, no arguments needed just "launch and pray"
 ``` shell
 # make sure it's executable and
-./installer.sh
+./setup.sh
 ```
 
 #### shortcut_helper.sh
-Helps creating shortcuts for mintty in various locations for all the WSL distributions it can find installed. The mintty will be launched with `-h error --WSL='${distro}' -~ /bin/bash -l`. (Maybe I should move/add this to settings.sh)  
+Helps creating shortcuts for mintty in various locations for all the WSL distributions it can find installed. The mintty will be launched with `--WSL='${distro}' <$mintty_args>`, which is defined in the settings.sh the default value is `-~ /bin/bash -l`.
 
 ``` shell
 $ ./shortcut_helper.sh -h
@@ -57,10 +57,10 @@ Developed and tested on a Ubuntu 18.04.
 
 1. Get a copy of the scripts, either with a `git clone` or by downloading as a zip.
 2. modify/configure settings.sh 
-3. run the installer.sh script
+3. run the setup.sh script
 4. run the shortcut_helper.sh script with the parameters you need/want.
 5. ...
-6. (you thought I was gonna say "Profit") whenever you want to update/check for updates of the packages just run the installer.sh again, it will download files only if missing or newer.
+6. (you thought I was gonna say "Profit") whenever you want to update/check for updates of the packages just run the setup.sh again, it will download files only if missing or newer.
 
 # Credits/Disclaimer
 
