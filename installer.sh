@@ -5,15 +5,15 @@ set -e
 
 wget="wget --show-progress -qcN -P ${SRC_FOLDER} " # add some defaults to wget: progress bar, flags to download the file only if missing or the remote one is newer
 
-mkdir -p "${SRC_FOLDER}/tmp" ${DEST_FOLDER}
+mkdir -p "${SRC_FOLDER:?}/tmp" "${DEST_FOLDER:?}"
 
 # some functions
 d_setup(){
 	# download and check cygwin's setup.ini
-	$wget "${MIRROR}/${ARCH}/setup.ini"
+	$wget "${MIRROR:?}/${ARCH:?}/setup.ini"
 	$wget "${MIRROR}/${ARCH}/sha512.sum"
 	echo -e "\e[96m"
-	cd ${SRC_FOLDER}
+	cd "${SRC_FOLDER}"
 	sha512sum -c sha512.sum --ignore-missing || (
 	# recursive call if something is off 
 	rm setup.ini sha512.sum
@@ -27,9 +27,9 @@ d_setup(){
 d_cygpkg(){
 	# searches the required package in the setup.ini and downloads it
 	# maybe it could be a good idea to remove previous versions ?!
-	grep -cqE "^@ ${1}$" ${SRC_FOLDER}/setup.ini || (echo "${1} not found"; exit 255)
+	grep -cqE "^@ ${1}$" "${SRC_FOLDER}/setup.ini" || (echo "${1} not found"; exit 255)
 	# gets the line with the infos for the latest version; line format: "install: <uri> <file size> <sha512sum hash>"
-    line=$(grep -E "^@ ${1}$" -A 50 ${SRC_FOLDER}/setup.ini | grep "install: " | head -1)
+    line=$(grep -E "^@ ${1}$" -A 50 "${SRC_FOLDER}/setup.ini" | grep "install: " | head -1)
     uri=$(echo "$line" | awk '{print $2}')
 	pkg_file="${SRC_FOLDER}/${uri##*/}" # I'll need this later 
     check_sum=$(echo "$line" | awk '{print $4}')
@@ -53,25 +53,25 @@ d_wslbridge(){
 cp_frompkg(){
 	# copy what's needed from 
 	src="$1"
-	cd ${SRC_FOLDER}/tmp # "dirty trick" in order to get the right folder structure without using on string manipulations (awk, sed, ...) 
+	cd "${SRC_FOLDER}/tmp" # "dirty trick" in order to get the right folder structure without using on string manipulations (awk, sed, ...)
 	cp="cp --parents -rvup" # copy, only if missing or newer, to destination replicating the folder structure starting from the current folder
 
 	dst="${DEST_FOLDER}"
 	if [[ "$1" =~ "#" ]]; then
-		src=$(echo $1 | awk -F'#' '{print $1}')
-		dst="${dst}/$(echo $1 | awk -F'#' '{print $2}')"
+		src="$(echo "$1" | awk -F'#' '{print $1}')"
+		dst="${dst}/$(echo "$1" | awk -F'#' '{print $2}')"
 		mkdir -p "${dst%/*}"
 		cp="cp -rvup" # in this case we "rewrite" the folder structure, so we must not create the same folder structure
 	fi
 	for i in ${src}; do
-		$cp ${i} "${dst}" || (
+		$cp "${i}" "${dst}" || (
 			# copy failed, usually 'cause file is in use ... you are running inside mintty
 			# these are windows files/exceutables, so we cant' overwrite or delete them as in linux, so e have to move them
 			# then retry the copy operation
-			[ -f ${i} ] && ( # it's a file, otherwise ... i don't know
-				t_dst="${dst%/}"; [ -d ${t_dst} ] && t_dst="${t_dst}/${i##*/}"
+			[ -f "${i}" ] && ( # it's a file, otherwise ... i don't know
+				t_dst="${dst%/}"; [ -d "${t_dst}" ] && t_dst="${t_dst}/${i##*/}"
 				mv -v "${t_dst}" "${t_dst}.2del"
-				$cp ${i} "${dst}"
+				$cp "${i}" "${dst}"
 			)
 		)
 	done
@@ -121,21 +121,21 @@ pkgs[:d_wslbridge]="wslbridge*/wslbridge*#bin/"
  
 
 # clean up leftovers from the last run # 2> /dev/null
-find ${DEST_FOLDER} -name '*.2del' -delete  || echo -n ''
+find "${DEST_FOLDER}" -name '*.2del' -delete  || echo -n ''
 
 for pkg in "${!pkgs[@]}"; do
-    rm -rf ${SRC_FOLDER}/tmp/*
+    rm -rf "${SRC_FOLDER}"/tmp/*
     if [[ "$pkg" =~ ":" ]]; then # not cygwin package
     	${pkg##*:}  # call function
     else
-		d_cygpkg $pkg # downloads the latest cygwin package, and sets the path to the file to pkg_file
+		d_cygpkg "$pkg" # downloads the latest cygwin package, and sets the path to the file to pkg_file
 	fi
-    tar xf "$pkg_file" -C ${SRC_FOLDER}/tmp
+    tar xf "$pkg_file" -C "${SRC_FOLDER}/tmp"
 	srcp=${pkgs[$pkg]} # path with the file/folder of interest
     [ "$srcp" != "" ] && for sp in ${srcp}; do cp_frompkg "${sp}"; done
 done
-rm -rf ${SRC_FOLDER}/tmp/*
+rm -rf "${SRC_FOLDER}"/tmp/*
 
 # create a home folder for the current user in the destination folder
-u=$(cmd.exe /C "echo %USERNAME%" | tr -d '\r')
-mkdir -p ${DEST_FOLDER}/home/${u}
+u=$(/mnt/c/Windows/System32/cmd.exe /C "echo %USERNAME%" | tr -d '\r')
+mkdir -p "${DEST_FOLDER}/home/${u}"
