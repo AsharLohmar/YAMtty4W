@@ -67,4 +67,5 @@ Developed and tested on a Ubuntu 18.04.
 As my work was only to write these script, the credits should go to the appropriate owners and developers of the software the scripts are downloading:
  * [mintty](http://mintty.github.io/) - Mintty is the Cygwin Terminal emulator, also available for MSYS and Msys2.
  * [Cygwin](https://www.cygwin.com) - a DLL (cygwin1.dll) which provides substantial POSIX API functionality.
- * [wslbridge](https://github.com/rprichard/wslbridge) - Bridge from Cygwin to WSL pty/pipe I/O
+ * ~[wslbridge](https://github.com/rprichard/wslbridge)~ [wslbridge2](https://github.com/Biswa96/wslbridge2) - Bridge from Cygwin to WSL pty/pipe I/O
+
