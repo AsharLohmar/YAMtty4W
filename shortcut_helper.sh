@@ -86,7 +86,11 @@ build_shortcut(){
 	sh_cmd+="\$s.Arguments = \"--WSL='${distro}' ${mintty_args}\"; "
 	sh_cmd+="\$s.Description = \"${distro} - mintty\"; "
 	sh_cmd+="\$s.WorkingDirectory = \"$(wslpath -aw "$DEST_FOLDER")\"; "
-	sh_cmd+="\$s.IconLocation = \"$(wslpath -aw "$(grep -lr WslLaunch "${d_u_path}"/*.exe)")\"; "
+	if [ "$(grep -lr WslLaunch "${d_u_path}"/*.exe 2>/dev/null | wc -l)" == 0 ]; then
+		sh_cmd+="\$s.IconLocation = \"${w_minty_path}\"; "
+	else
+		sh_cmd+="\$s.IconLocation = \"$(wslpath -aw "$(grep -lr WslLaunch "${d_u_path}"/*.exe)")\"; "
+	fi
 	sh_cmd+="\$s.Save()"
 	"$ps_cmd" "$sh_cmd"
 }
@@ -100,7 +104,7 @@ get_sys_folder(){
 if [ -n "$(command -v powershell)" ]; then
 	ps_cmd="powershell"
 else
-	ps_cmd="$(wslpath -a "$(cmd /c "where powershell" | tr -d '\r')")"
+	ps_cmd="$(wslpath -a "$(cmd.exe /c "where powershell" | tr -d '\r')")"
 fi
 while read -r l; do
 	distro="$(awk -F'###' '{print $1}' <<< "$l")"

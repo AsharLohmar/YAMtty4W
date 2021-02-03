@@ -96,10 +96,13 @@ unpack_pkg(){
             tar xf "$pkg_file" -C "${SRC_FOLDER}/tmp"
             ;;
         *.7z)
-             7zr e "$pkg_file" -o"${SRC_FOLDER}/tmp" -y > /dev/null
+            7zr e "$pkg_file" -o"${SRC_FOLDER}/tmp" -y > /dev/null
             ;;
+		*.zip)
+			unzip -o -d"${SRC_FOLDER}/tmp" "$pkg_file"
+			;;
         *)
-            echo SWR
+            echo "SWR ${pkg_file}"
             exit 1
             ;;
     esac
