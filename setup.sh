@@ -54,7 +54,7 @@ d_wslbridge2(){
     # gets the latest version of wslbridge
     rel="32"
     [[ "$ARCH" =~ "64" ]] && rel="64"
-    uri=$(wget "https://github.com/Biswa96/wslbridge2/releases/latest" -qO - | grep -E 'href.*cygwin.*'${rel} | awk '{print $2}' | awk -F\" '{print $2}')
+    uri=$(wget "$(wget https://github.com/Biswa96/wslbridge2/releases/latest -O -  2>&1 --max-redirect 0 | grep Location | awk '{print $2}' | sed 's/tag/expanded_assets/g')" -qO - | grep -E 'href.*cygwin.*'${rel} | awk '{print $2}' | awk -F\" '{print $2}')
     pkg_file="${SRC_FOLDER}/${uri##*/}" # I'll need this later
     $wget "https://github.com${uri}"
     echo -e "\n\e[96mwslbridge2\e[0m"
